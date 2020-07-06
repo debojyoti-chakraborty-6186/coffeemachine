@@ -41,15 +41,19 @@ public class VendingUnit {
         Map<String, Integer> ingredientQtyMap = ingredientController.getIngredientQuantityMap();
         synchronized (ingredientQtyMap) {
             for (Map.Entry<String, Integer> mapItr : beverage.getIngredientQuantityMap().entrySet()) {
+                //Checking if required quantity is present in the inventory to make the beverage
                 if (ingredientQtyMap.get(mapItr.getKey()) < mapItr.getValue()) {
                     throw new IllegalArgumentException("Required quantity not available");
                 }
             }
             System.out.println("Dispensing SUCCESS for " + beverage.getName() + " from vending machine: " + this.id);
 
-            //Reducing quantity
+            //Reducing quantity after dispensing beverage
             for (Map.Entry<String, Integer> mapItr : beverage.getIngredientQuantityMap().entrySet()) {
                 ingredientQtyMap.put(mapItr.getKey(), ingredientQtyMap.get(mapItr.getKey())-mapItr.getValue());
+                if (ingredientQtyMap.get(mapItr.getKey())-mapItr.getValue() < ingredientController.getIngredientByName(mapItr.getKey()).getMinQuantity()) {
+                    System.out.println("WARNING:: " + mapItr.getKey() + " quantity is running LOW, PLEASE REFILL");
+                }
             }
         }
     }
